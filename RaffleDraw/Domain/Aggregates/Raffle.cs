@@ -32,14 +32,14 @@ public class Raffle: AggregateRoot<DomainEvent>
     private Raffle(IWinnerSelector winnerSelector, params DomainEvent[] events ): this(winnerSelector) => base.Rehydrate(events.AsEnumerable());
 
 
-    internal static Raffle Create(string title, int numberOfTickets, decimal price, IWinnerSelector winnerSelector = null)
+    public static Raffle Create(string title, int numberOfTickets, decimal price, IWinnerSelector winnerSelector = null)
     {
         var raffle = new Raffle(winnerSelector);
         raffle.Handle(new CreateRaffle(title, numberOfTickets, price));
         return raffle;
     }
 
-    internal static Raffle LoadFromHistory(IEnumerable<DomainEvent> events, IWinnerSelector winnerSelector = null)
+    public static Raffle LoadFromHistory(IEnumerable<DomainEvent> events, IWinnerSelector winnerSelector = null)
     {
         var raffle = new Raffle(winnerSelector, [.. events]);
         return raffle;
@@ -47,19 +47,19 @@ public class Raffle: AggregateRoot<DomainEvent>
 
     internal void Handle(CreateRaffle createRaffle)
     {
-        if (string.IsNullOrWhiteSpace(createRaffle.title))
+        if (string.IsNullOrWhiteSpace(createRaffle.Title))
         {
-            throw new ArgumentException("Title cannot be empty.", nameof(createRaffle.title));
+            throw new ArgumentException("Title cannot be empty.", nameof(createRaffle.Title));
         }
-        if (createRaffle.numberOfTickets <= 0)
+        if (createRaffle.NumberOfTickets <= 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(createRaffle.numberOfTickets), "Number of tickets must be greater than zero.");
+            throw new ArgumentOutOfRangeException(nameof(createRaffle.NumberOfTickets), "Number of tickets must be greater than zero.");
         }
-        if (createRaffle.price <= 0)
+        if (createRaffle.Price <= 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(createRaffle.price), "Ticket price must be greater than zero.");
+            throw new ArgumentOutOfRangeException(nameof(createRaffle.Price), "Ticket price must be greater than zero.");
         }
-        RaiseEvent(new RaffleCreated(createRaffle.title, createRaffle.numberOfTickets, createRaffle.price));
+        RaiseEvent(new RaffleCreated(createRaffle.Title, createRaffle.NumberOfTickets, createRaffle.Price));
     }
 
     internal void Handle(BuyTicket buyTicket)
