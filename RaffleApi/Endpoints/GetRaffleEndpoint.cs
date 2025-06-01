@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using RaffleDraw.Domain.Aggregates;
 using RaffleDraw.Domain.Events;
+using RaffleDraw.Features.GetRaffle;
 namespace RaffleApi.Endpoints;
 
 public class GetRaffleRequest
@@ -21,7 +22,7 @@ public class GetRaffleResponse
 
 }
 
-public class GetRaffleEndpoint: Endpoint<GetRaffleRequest,GetRaffleResponse>
+public class GetRaffleEndpoint(Handler Handler): Endpoint<GetRaffleRequest,GetRaffleResponse>
 {
     public override void Configure()
     {
@@ -39,8 +40,8 @@ public class GetRaffleEndpoint: Endpoint<GetRaffleRequest,GetRaffleResponse>
 
     public override async Task HandleAsync(GetRaffleRequest req, CancellationToken ct)
     {
-        
-        var raffle = await Task.FromResult<Raffle>(Raffle.LoadFromHistory([new RaffleCreated()]); // Temporary placeholder
+
+        var raffle = await Handler.HandleAsync(new(req.Id), ct);
 
         if (raffle == null)
         {

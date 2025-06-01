@@ -1,7 +1,9 @@
-﻿using RaffleDraw.Domain.Commands;
-using RaffleDraw.Domain.Common;
-using RaffleDraw.Domain.Events;
+﻿using RaffleDraw.Core.Common;
 using RaffleDraw.Domain.Ports;
+using RaffleDraw.Domain.Services;
+using RaffleDraw.Features.BuyTicket;
+using RaffleDraw.Features.CreateRaffle;
+using RaffleDraw.Features.SelectWinner;
 using System.Collections.ObjectModel;
 
 namespace RaffleDraw.Domain.Aggregates;
@@ -32,10 +34,10 @@ public class Raffle: AggregateRoot<DomainEvent>
     private Raffle(IWinnerSelector winnerSelector, params DomainEvent[] events ): this(winnerSelector) => base.Rehydrate(events.AsEnumerable());
 
 
-    public static Raffle Create(string title, int numberOfTickets, decimal price, IWinnerSelector winnerSelector = null)
+    public static Raffle Create(Features.CreateRaffle.Command createRaffleCommand, IWinnerSelector winnerSelector = null)
     {
         var raffle = new Raffle(winnerSelector);
-        raffle.Handle(new CreateRaffle(title, numberOfTickets, price));
+        raffle.Handle(createRaffleCommand);
         return raffle;
     }
 
@@ -45,7 +47,7 @@ public class Raffle: AggregateRoot<DomainEvent>
         return raffle;
     }
 
-    internal void Handle(CreateRaffle createRaffle)
+    internal void Handle(Features.CreateRaffle.Command createRaffle)
     {
         if (string.IsNullOrWhiteSpace(createRaffle.Title))
         {
@@ -62,7 +64,7 @@ public class Raffle: AggregateRoot<DomainEvent>
         RaiseEvent(new RaffleCreated(createRaffle.Title, createRaffle.NumberOfTickets, createRaffle.Price));
     }
 
-    internal void Handle(BuyTicket buyTicket)
+    internal void Handle(Features.BuyTicket.Command buyTicket)
     {
         if (_availableTickets.Count <= 0)
         {
@@ -74,7 +76,7 @@ public class Raffle: AggregateRoot<DomainEvent>
         }
         RaiseEvent(new TicketBought(buyTicket.BuyerName, Id, buyTicket.TicketNumber));
     }
-    internal void Handle(SelectWinner selectWinner)
+    internal void Handle(Features.SelectWinner.Command selectWinner)
     {
         if (_boughtTickets.Count == 0)
         {

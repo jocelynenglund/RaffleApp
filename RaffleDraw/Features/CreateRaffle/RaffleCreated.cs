@@ -1,6 +1,6 @@
-﻿using RaffleDraw.Domain.Common;
+﻿using RaffleDraw.Core.Common;
 
-namespace RaffleDraw.Domain.Events;
+namespace RaffleDraw.Features.CreateRaffle;
 
 public record RaffleCreated(string Title, int NumberOfTickets, decimal Price, Guid Id): DomainEvent
 {

@@ -1,6 +1,6 @@
 ﻿using RaffleDraw.Domain.Ports;
 
-namespace RaffleDraw.Domain;
+namespace RaffleDraw.Domain.Services;
 
 public class RandomWinnerSelector: IWinnerSelector
 {

@@ -1,10 +1,10 @@
 ﻿
 using RaffleDraw.Domain.Aggregates;
-using RaffleDraw.Domain.Commands;
-using RaffleDraw.Domain.Events;
 using RaffleDraw.Domain.Ports;
+using RaffleDraw.Features.BuyTicket;
+using RaffleDraw.Features.CreateRaffle;
+using RaffleDraw.Features.SelectWinner;
 using Shouldly;
-using System.Security.Cryptography.X509Certificates;
 
 namespace TheTests.Domain.Aggregates;
 
@@ -14,7 +14,7 @@ public class RaffleTests
     [Fact]
     public void ShouldSetTitle_WhenCreateCommandIsTriggered()
     {
-        var raffle = Raffle.Create("My Raffle", 100, 100.00m);
+        var raffle = Raffle.Create(new("My Raffle", 100, 100.00m));
         raffle.Title.ShouldBe("My Raffle");
     }
 
@@ -31,9 +31,9 @@ public class RaffleTests
     [Fact]
     public void ShouldAddToEligibleWinners_WhenTicketIsBought() { 
     
-        var raffle = Raffle.Create("My Raffle", 100, 100.00m);
+        var raffle = Raffle.Create(new("My Raffle", 100, 100.00m));
 
-        raffle.Handle(new BuyTicket("Jane Doe"));
+        raffle.Handle(new RaffleDraw.Features.BuyTicket.Command("Jane Doe"));
 
         raffle.BoughtTickets.Count.ShouldBe(1);
         raffle.BoughtTickets[0].Name.ShouldBe("Jane Doe");
@@ -47,7 +47,7 @@ public class RaffleTests
             new RaffleCreated("My Raffle", 1, 100.00m),
             new TicketBought("Jane Doe", Guid.NewGuid())
         ]);
-        Should.Throw<InvalidOperationException>(() => raffle.Handle(new BuyTicket("John Doe")));
+        Should.Throw<InvalidOperationException>(() => raffle.Handle(new RaffleDraw.Features.BuyTicket.Command("John Doe")));
     }
 
     class LastManWinnerSelector : IWinnerSelector
@@ -69,7 +69,7 @@ public class RaffleTests
             new TicketBought("Joseph Doe", Guid.NewGuid())
         ], new LastManWinnerSelector());
 
-        raffle.Handle(new SelectWinner(raffle.Id));
+        raffle.Handle(new RaffleDraw.Features.SelectWinner.Command(raffle.Id));
 
         raffle.UncommittedChanges.Count.ShouldBe(1);
 
@@ -82,7 +82,7 @@ public class RaffleTests
     }
 
     [Fact]
-    public void ShouldThrowException_IfNoTicketsHaveBeenBought()
+    public void SelectWinner_ShouldThrowException_IfNoTicketsHaveBeenBought()
     {
         var raffle = Raffle.LoadFromHistory(
         [
@@ -90,7 +90,7 @@ public class RaffleTests
         ]);
 
 
-        Should.Throw<InvalidOperationException>(() => raffle.Handle(new SelectWinner(raffle.Id)));
+        Should.Throw<InvalidOperationException>(() => raffle.Handle(new RaffleDraw.Features.SelectWinner.Command(raffle.Id)));
 
     }
 

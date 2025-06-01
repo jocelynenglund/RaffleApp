@@ -1,5 +1,5 @@
-﻿using RaffleDraw.Domain.Common;
+﻿using RaffleDraw.Core.Common;
 
-namespace RaffleDraw.Domain.Events;
+namespace RaffleDraw.Features.BuyTicket;
 
 public record TicketBought(string BuyerName, Guid RaffleId, int? TicketNumber = null) : DomainEvent;
