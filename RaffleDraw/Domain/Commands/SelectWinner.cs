@@ -2,4 +2,4 @@
 
 namespace RaffleDraw.Domain.Commands;
 
-public record SelectWinner(Guid RaffleId, int TicketNumber): Command;
+public record SelectWinner(Guid RaffleId): Command;

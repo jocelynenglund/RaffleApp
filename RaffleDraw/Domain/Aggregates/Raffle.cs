@@ -10,8 +10,6 @@ public class Raffle: AggregateRoot<DomainEvent>
 {
     private int _numberOfTickets;
     private decimal _ticketPrice;
-    List<string> _ticketHolders = new List<string>();
-    public ReadOnlyCollection<string> EligibleWinners => _ticketHolders.AsReadOnly();
 
     public int InitialTicketNumber => 1000; // Starting point for ticket numbers
 
@@ -78,15 +76,15 @@ public class Raffle: AggregateRoot<DomainEvent>
     }
     internal void Handle(SelectWinner selectWinner)
     {
-        if (_ticketHolders.Count == 0)
+        if (_boughtTickets.Count == 0)
         {
             throw new InvalidOperationException("No tickets have been bought. Cannot select a winner.");
         }
+       var winner = _winnerSelector.ChooseWinner([.. _boughtTickets.Select(t => t.Number)]);
+        var winningTicket = _boughtTickets.FirstOrDefault(x => x.Number == winner);
+            
 
-        var winningTicket = _boughtTickets.FirstOrDefault(x => x.Number == selectWinner.TicketNumber)
-            ?? throw new InvalidOperationException($"Ticket number {selectWinner.TicketNumber} does not exist.");
-
-        RaiseEvent(new WinnerSelected(selectWinner.TicketNumber, Id));
+        RaiseEvent(new WinnerSelected(winningTicket.Number, Id));
     }
 
     private void When(RaffleCreated @event)
@@ -101,7 +99,6 @@ public class Raffle: AggregateRoot<DomainEvent>
     }
     private void When(TicketBought @event)
     {
-        _ticketHolders.Add(@event.BuyerName);
         var ticket = _availableTickets.Find(t => t.Number == @event.TicketNumber) ?? _availableTickets.First();
      
         ticket.Name = @event.BuyerName;

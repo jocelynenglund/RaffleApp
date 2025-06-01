@@ -35,8 +35,8 @@ public class RaffleTests
 
         raffle.Handle(new BuyTicket("Jane Doe"));
 
-        raffle.EligibleWinners.Count.ShouldBe(1);
-        raffle.EligibleWinners[0].ShouldBe("Jane Doe");
+        raffle.BoughtTickets.Count.ShouldBe(1);
+        raffle.BoughtTickets[0].Name.ShouldBe("Jane Doe");
     }
 
     [Fact]
@@ -67,9 +67,9 @@ public class RaffleTests
             new TicketBought("Jane Doe", Guid.NewGuid()),
             new TicketBought("John Doe", Guid.NewGuid()),
             new TicketBought("Joseph Doe", Guid.NewGuid())
-        ]);
+        ], new LastManWinnerSelector());
 
-        raffle.Handle(new SelectWinner(raffle.Id, raffle.InitialTicketNumber + 2));
+        raffle.Handle(new SelectWinner(raffle.Id));
 
         raffle.UncommittedChanges.Count.ShouldBe(1);
 
@@ -90,7 +90,7 @@ public class RaffleTests
         ]);
 
 
-        Should.Throw<InvalidOperationException>(() => raffle.Handle(new SelectWinner(raffle.Id, raffle.InitialTicketNumber)));
+        Should.Throw<InvalidOperationException>(() => raffle.Handle(new SelectWinner(raffle.Id)));
 
     }
 
