@@ -7,9 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Domain\Events\" />
     <Folder Include="Features\" />
-	  <InternalsVisibleTo Include ="TheTests"/>
+	  <InternalsVisibleTo Include="TheTests" />
   </ItemGroup>
 
 </Project>

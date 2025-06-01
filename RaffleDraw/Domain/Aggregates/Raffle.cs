@@ -1,34 +1,49 @@
-﻿using RaffleDraw.Domain.Common;
+﻿using RaffleDraw.Domain.Commands;
+using RaffleDraw.Domain.Common;
+using RaffleDraw.Domain.Events;
+using RaffleDraw.Domain.Ports;
 using System.Collections.ObjectModel;
 
 namespace RaffleDraw.Domain.Aggregates;
 
-public class Raffle: AggregateRoot<IEvent>
+public class Raffle: AggregateRoot<DomainEvent>
 {
     private int _numberOfTickets;
     private decimal _ticketPrice;
     List<string> _ticketHolders = new List<string>();
-    public ReadOnlyCollection<string> EligibleWinners => _ticketHolders.AsReadOnly(); 
+    public ReadOnlyCollection<string> EligibleWinners => _ticketHolders.AsReadOnly();
 
+    public int InitialTicketNumber => 1000; // Starting point for ticket numbers
+
+    private List<Ticket> _availableTickets = [];
+    public ReadOnlyCollection<Ticket> AvailableTickets => _availableTickets.AsReadOnly();
+
+    private List<Ticket> _boughtTickets = [];
+    public ReadOnlyCollection<Ticket> BoughtTickets => _boughtTickets.AsReadOnly();
+
+    private List<Ticket> _selectedTickets = new List<Ticket>();
+    public ReadOnlyCollection<Ticket> SelectedTickets => _selectedTickets.AsReadOnly();
     public Guid Id { get; private set; }
     public string Title { get; internal set; }
 
-    private Raffle() {
+    private IWinnerSelector _winnerSelector;
+    private Raffle(IWinnerSelector winnerSelector = null) {
         Title = "Default Title";
+        _winnerSelector = winnerSelector ?? new RandomWinnerSelector();
     }
-    private Raffle(params IEvent[] events) => base.Rehydrate(events.AsEnumerable());
+    private Raffle(IWinnerSelector winnerSelector, params DomainEvent[] events ): this(winnerSelector) => base.Rehydrate(events.AsEnumerable());
 
 
-    internal static Raffle Create(string title, int numberOfTickets, decimal price)
+    internal static Raffle Create(string title, int numberOfTickets, decimal price, IWinnerSelector winnerSelector = null)
     {
-        var raffle = new Raffle();
+        var raffle = new Raffle(winnerSelector);
         raffle.Handle(new CreateRaffle(title, numberOfTickets, price));
         return raffle;
     }
 
-    internal static Raffle LoadFromHistory(IEnumerable<IEvent> events)
+    internal static Raffle LoadFromHistory(IEnumerable<DomainEvent> events, IWinnerSelector winnerSelector = null)
     {
-        var raffle = new Raffle(events.ToArray());
+        var raffle = new Raffle(winnerSelector, [.. events]);
         return raffle;
     }
 
@@ -51,7 +66,7 @@ public class Raffle: AggregateRoot<IEvent>
 
     internal void Handle(BuyTicket buyTicket)
     {
-        if (_numberOfTickets <= 0)
+        if (_availableTickets.Count <= 0)
         {
             throw new InvalidOperationException("No tickets left to buy.");
         }
@@ -59,7 +74,7 @@ public class Raffle: AggregateRoot<IEvent>
         {
             throw new ArgumentException("Buyer name cannot be empty.", nameof(buyTicket.BuyerName));
         }
-        RaiseEvent(new TicketBought(buyTicket.BuyerName, Id));
+        RaiseEvent(new TicketBought(buyTicket.BuyerName, Id, buyTicket.TicketNumber));
     }
     internal void Handle(SelectWinner selectWinner)
     {
@@ -67,11 +82,11 @@ public class Raffle: AggregateRoot<IEvent>
         {
             throw new InvalidOperationException("No tickets have been bought. Cannot select a winner.");
         }
-        var random = new Random();
-        int winnerIndex = random.Next(_ticketHolders.Count);
-        string winner = _ticketHolders[winnerIndex];
- 
-        RaiseEvent(new WinnerSelected(winner, Id));
+
+        var winningTicket = _boughtTickets.FirstOrDefault(x => x.Number == selectWinner.TicketNumber)
+            ?? throw new InvalidOperationException($"Ticket number {selectWinner.TicketNumber} does not exist.");
+
+        RaiseEvent(new WinnerSelected(selectWinner.TicketNumber, Id));
     }
 
     private void When(RaffleCreated @event)
@@ -80,31 +95,36 @@ public class Raffle: AggregateRoot<IEvent>
         Title = @event.Title;
         _numberOfTickets = @event.NumberOfTickets;
         _ticketPrice = @event.Price;
+
+        _availableTickets = [.. Enumerable.Range(InitialTicketNumber, _numberOfTickets).Select(x => new Ticket(x))];
+        
     }
     private void When(TicketBought @event)
     {
         _ticketHolders.Add(@event.BuyerName);
-        _numberOfTickets--;
+        var ticket = _availableTickets.Find(t => t.Number == @event.TicketNumber) ?? _availableTickets.First();
+     
+        ticket.Name = @event.BuyerName;
+        _availableTickets.Remove(ticket);
+        _boughtTickets.Add(ticket);
     }
 
     private void When(WinnerSelected @event)
     {
-        _ticketHolders.Remove(@event.Name);
+        var ticket = _boughtTickets.FirstOrDefault(t => t.Number == @event.TicketNumber)
+            ?? throw new InvalidOperationException($"Ticket number {@event.TicketNumber} does not exist.");
+
+        _selectedTickets.Add(ticket);
     }
 
-    protected override void ApplyEvent(IEvent @event)
+    protected override void ApplyEvent(DomainEvent @event)
     {
         When((dynamic)@event);
     }
-
-  
 }
 
-public interface IEvent { }
-public interface  ICommand { }
-public record RaffleCreated(string Title, int NumberOfTickets, decimal Price) : IEvent;
-public record TicketBought(string BuyerName, Guid RaffleId) : IEvent;
-public record WinnerSelected(string Name, Guid RaffleID): IEvent;
-public record CreateRaffle(string title, int numberOfTickets, decimal price);
-public record BuyTicket(string BuyerName): ICommand;
-public record SelectWinner(): ICommand;
+public record Ticket(int Number)
+{
+    public string Name { get; set; } = string.Empty;    
+}
+

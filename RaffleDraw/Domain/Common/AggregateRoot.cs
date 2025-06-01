@@ -1,4 +1,4 @@
-﻿namespace RaffleDraw.Domain.Aggregates;
+﻿namespace RaffleDraw.Domain.Common;
 
 public abstract class AggregateRoot<TEvent>
 {

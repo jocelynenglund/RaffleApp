@@ -1,6 +1,10 @@
 ﻿
 using RaffleDraw.Domain.Aggregates;
+using RaffleDraw.Domain.Commands;
+using RaffleDraw.Domain.Events;
+using RaffleDraw.Domain.Ports;
 using Shouldly;
+using System.Security.Cryptography.X509Certificates;
 
 namespace TheTests.Domain.Aggregates;
 
@@ -14,6 +18,16 @@ public class RaffleTests
         raffle.Title.ShouldBe("My Raffle");
     }
 
+    [Fact]
+    public void ShouldListAvailableTickets_WhenRaffleIsCreated()
+    {
+        var raffle = Raffle.LoadFromHistory(
+         [
+             new RaffleCreated("My Raffle", 1, 100.00m)
+         ]);
+
+        raffle.AvailableTickets.Count.ShouldBe(1);
+    }
     [Fact]
     public void ShouldAddToEligibleWinners_WhenTicketIsBought() { 
     
@@ -36,22 +50,35 @@ public class RaffleTests
         Should.Throw<InvalidOperationException>(() => raffle.Handle(new BuyTicket("John Doe")));
     }
 
+    class LastManWinnerSelector : IWinnerSelector
+    {
+        public int ChooseWinner(IReadOnlyList<int> holders)
+        {
+            return holders.Last();
+        }
+    }
+
     [Fact]
     public void ShouldSelectARandomWinner_WhenWinnerSelectionIsTriggered()
     {
         var raffle = Raffle.LoadFromHistory(
         [
-            new RaffleCreated("My Raffle", 1, 100.00m),
+            new RaffleCreated("My Raffle", 100, 100.00m),
             new TicketBought("Jane Doe", Guid.NewGuid()),
             new TicketBought("John Doe", Guid.NewGuid()),
             new TicketBought("Joseph Doe", Guid.NewGuid())
         ]);
 
-        raffle.Handle(new SelectWinner());
+        raffle.Handle(new SelectWinner(raffle.Id, raffle.InitialTicketNumber + 2));
 
         raffle.UncommittedChanges.Count.ShouldBe(1);
 
-        raffle.UncommittedChanges.ShouldContain(e => e is WinnerSelected);
+        raffle.UncommittedChanges.OfType<WinnerSelected>()
+            .Any(winnerSelected => winnerSelected.TicketNumber == raffle.InitialTicketNumber+2)
+            .ShouldBeTrue();
+        raffle.SelectedTickets
+            .Any(ticket => ticket.Name == "Joseph Doe")
+            .ShouldBeTrue();
     }
 
     [Fact]
@@ -62,7 +89,8 @@ public class RaffleTests
            new RaffleCreated("My Raffle", 1, 100.00m)
         ]);
 
-        Should.Throw<InvalidOperationException>(() => raffle.Handle(new SelectWinner()));
+
+        Should.Throw<InvalidOperationException>(() => raffle.Handle(new SelectWinner(raffle.Id, raffle.InitialTicketNumber)));
 
     }
 
