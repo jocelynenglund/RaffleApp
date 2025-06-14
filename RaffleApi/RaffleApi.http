@@ -32,5 +32,5 @@ Content-type: application/json
 
 ### Select winner
 # @name selectWinner
-POST {{RaffleApi_HostAddress}}{{location}}/select-winner
+POST {{RaffleApi_HostAddress}}{{location}}/winner
 Accept: application/json

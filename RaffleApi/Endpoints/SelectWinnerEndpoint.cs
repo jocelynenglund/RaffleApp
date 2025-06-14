@@ -16,7 +16,7 @@ public class SelectWinnerEndpoint(Handler handler) : Endpoint<SelectWinnerReques
 {
     public override void Configure()
     {
-        Post("/raffles/{id}/select-winner");
+        Post("/raffles/{id}/winner");
         AllowAnonymous();
         Summary(s =>
         {

@@ -33,7 +33,7 @@ The following endpoints are available:
 - `POST /raffles` - create a raffle.
 - `GET /raffles/{id}` - retrieve a raffle by id.
 - `POST /raffles/{id}/tickets` - purchase a ticket.
-- `POST /raffles/{id}/select-winner` - select a winning ticket and return the ticket number.
+- `POST /raffles/{id}/winner` - select a winning ticket and return the ticket number.
 
 ## Running tests
 
