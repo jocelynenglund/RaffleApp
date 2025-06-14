@@ -33,10 +33,12 @@ public class RaffleTests
     
         var raffle = Raffle.Create(new("My Raffle", 100, 100.00m));
 
-        raffle.Handle(new RaffleDraw.Features.BuyTicket.Command("Jane Doe"));
+        var ticketNumber = raffle.Handle(new RaffleDraw.Features.BuyTicket.Command("Jane Doe"));
 
+        ticketNumber.ShouldBe(raffle.InitialTicketNumber);
         raffle.BoughtTickets.Count.ShouldBe(1);
         raffle.BoughtTickets[0].Name.ShouldBe("Jane Doe");
+        raffle.AvailableTickets.Count.ShouldBe(99);
     }
 
     [Fact]
