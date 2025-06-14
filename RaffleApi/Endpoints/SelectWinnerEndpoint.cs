@@ -40,6 +40,11 @@ public class SelectWinnerEndpoint(Handler handler) : Endpoint<SelectWinnerReques
             AddError(ex.Message);
             await SendErrorsAsync(StatusCodes.Status400BadRequest, cancellation: ct);
         }
+        catch (InvalidOperationException ex) when (ex.Message.Contains("unselected"))
+        {
+            AddError(ex.Message);
+            await SendErrorsAsync(StatusCodes.Status400BadRequest, cancellation: ct);
+        }
         catch (InvalidOperationException ex) when (ex.Message.Contains("not found"))
         {
             await SendNotFoundAsync(ct);
