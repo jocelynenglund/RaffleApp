@@ -16,6 +16,8 @@ public class GetRaffleResponse
     public int AvailableTickets { get; set;}    
     public decimal TicketPrice { get; set;}
     public List<TicketInfo> BoughtTickets { get; set; } = [];
+    /// <summary>Tickets that have been selected as winners.</summary>
+    public List<TicketInfo> SelectedTickets { get; set; } = [];
     public record TicketInfo(int Number, string HolderName);
 
 }
@@ -55,9 +57,9 @@ public class GetRaffleEndpoint(Handler Handler): Endpoint<GetRaffleRequest,GetRa
             NumberOfTickets = raffle.AvailableTickets.Count + raffle.BoughtTickets.Count,
             TicketPrice = raffle.TicketPrice,
             // Map bought tickets to response model
-            BoughtTickets = [.. raffle.BoughtTickets.Select(t => new GetRaffleResponse.TicketInfo(t.Number, t.Name))]
-
-            // Add any additional properties needed
+            BoughtTickets = [.. raffle.BoughtTickets.Select(t => new GetRaffleResponse.TicketInfo(t.Number, t.Name))],
+            // Map winning tickets to response model
+            SelectedTickets = [.. raffle.SelectedTickets.Select(t => new GetRaffleResponse.TicketInfo(t.Number, t.Name))]
         };
 
         await SendAsync(response, cancellation: ct);

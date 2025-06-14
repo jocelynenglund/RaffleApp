@@ -31,7 +31,8 @@ The API listens on the default ASP.NET ports and provides Swagger UI for explora
 The following endpoints are available:
 
 - `POST /raffles` - create a raffle.
-- `GET /raffles/{id}` - retrieve a raffle by id.
+- `GET /raffles/{id}` - retrieve a raffle by id. The response now includes a
+  `selectedTickets` array listing winning tickets.
 - `POST /raffles/{id}/tickets` - purchase a ticket.
 - `POST /raffles/{id}/winner` - select a winning ticket and return the ticket number.
 
