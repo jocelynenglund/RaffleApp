@@ -1,5 +1,4 @@
 ﻿using FastEndpoints;
-using RaffleDraw.Domain.Aggregates;
 using RaffleDraw.Features.CreateRaffle;
 
 namespace RaffleApi.Endpoints;
@@ -23,8 +22,8 @@ public class CreateRaffleEndpoint(Handler handler): Endpoint<CreateRaffleRequest
 
     public override async Task HandleAsync(CreateRaffleRequest req, CancellationToken ct)
     {
-        var result = handler.HandleAsync(new Command(req.Title, req.NumberOfTickets, req.Price), ct); 
+        var result = await handler.HandleAsync(new Command(req.Title, req.NumberOfTickets, req.Price), ct); 
 
-        await SendCreatedAtAsync<GetRaffleEndpoint>(new {id = result});
+        await SendCreatedAtAsync<GetRaffleEndpoint>(new {id = result}, cancellation: ct);
     } 
 }

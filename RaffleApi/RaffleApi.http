@@ -1,7 +1,19 @@
+
 @RaffleApi_HostAddress = http://localhost:5041
 
-GET {{RaffleApi_HostAddress}}/raffles/4EEBFDB5-B06E-4791-A34F-264A5F214F03
-Accept: application/json
+### Create a raffle
+# @name createRaffle
+POST {{RaffleApi_HostAddress}}/raffles
+Content-Type: application/json
+
+{
+  "title": "The Great Raffle",
+  "numberOfTickets": 1000,
+  "price": 500
+}
+### Get the raffle by ID
+@location = {{createRaffle.response.headers.Location}}
 
 ###
-
+GET {{RaffleApi_HostAddress}}{{location}}
+Accept: application/json

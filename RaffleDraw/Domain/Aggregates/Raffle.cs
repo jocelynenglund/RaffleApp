@@ -11,7 +11,7 @@ namespace RaffleDraw.Domain.Aggregates;
 public class Raffle: AggregateRoot<DomainEvent>
 {
     private int _numberOfTickets;
-    private decimal _ticketPrice;
+    public decimal TicketPrice { get; private set; }
 
     public int InitialTicketNumber => 1000; // Starting point for ticket numbers
 
@@ -94,7 +94,7 @@ public class Raffle: AggregateRoot<DomainEvent>
         Id = Guid.NewGuid();
         Title = @event.Title;
         _numberOfTickets = @event.NumberOfTickets;
-        _ticketPrice = @event.Price;
+        this.TicketPrice = @event.Price;
 
         _availableTickets = [.. Enumerable.Range(InitialTicketNumber, _numberOfTickets).Select(x => new Ticket(x))];
         

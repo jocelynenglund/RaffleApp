@@ -1,7 +1,5 @@
 ﻿using FastEndpoints;
 using Microsoft.AspNetCore.Mvc;
-using RaffleDraw.Domain.Aggregates;
-using RaffleDraw.Domain.Events;
 using RaffleDraw.Features.GetRaffle;
 namespace RaffleApi.Endpoints;
 
@@ -54,7 +52,8 @@ public class GetRaffleEndpoint(Handler Handler): Endpoint<GetRaffleRequest,GetRa
             Id = raffle.Id,
             Title = raffle.Title,
             AvailableTickets = raffle.AvailableTickets.Count,
-
+            NumberOfTickets = raffle.AvailableTickets.Count + raffle.BoughtTickets.Count,
+            TicketPrice = raffle.TicketPrice,
             // Map bought tickets to response model
             BoughtTickets = [.. raffle.BoughtTickets.Select(t => new GetRaffleResponse.TicketInfo(t.Number, t.Name))]
 
