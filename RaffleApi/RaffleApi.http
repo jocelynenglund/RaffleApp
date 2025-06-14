@@ -1,4 +1,3 @@
-
 @RaffleApi_HostAddress = http://localhost:5041
 
 ### Create a raffle
@@ -31,6 +30,7 @@ Content-type: application/json
   "holderName": "{{HolderName}}"
 }
 
-
-# id e353bff6-d0f0-4760-baaf-1c728d0e91a9
-#/raffles/ccb2d383-3830-4b4d-a027-72ae4b7655ae
+### Select winner
+# @name selectWinner
+POST {{RaffleApi_HostAddress}}{{location}}/winner
+Accept: application/json

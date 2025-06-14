@@ -10,6 +10,7 @@ public static class Extensions
         services.AddScoped<Features.CreateRaffle.Handler>();
         services.AddScoped<Features.GetRaffle.Handler>();
         services.AddScoped<Features.BuyTicket.Handler>();
+        services.AddScoped<Features.SelectWinner.Handler>();
 
         services.AddSingleton<IRaffleRepository>(sp =>
         {
