@@ -1,0 +1,17 @@
+[
+  {
+    "$type": "RaffleCreated",
+    "Title": "THe mega raffle",
+    "NumberOfTickets": 100,
+    "Price": 50,
+    "Id": "b1aeb4d2-b415-48a3-ac3f-fb41e089acdd",
+    "OccurredOn": "2025-06-14T09:16:49.4279345Z"
+  },
+  {
+    "$type": "TicketBought",
+    "BuyerName": "Celyn",
+    "RaffleId": "b1aeb4d2-b415-48a3-ac3f-fb41e089acdd",
+    "TicketNumber": null,
+    "OccurredOn": "2025-06-14T09:17:52.6961971Z"
+  }
+]

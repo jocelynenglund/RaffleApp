@@ -2,5 +2,5 @@
 
 namespace RaffleDraw.Features.BuyTicket;
 
-public record Command(string BuyerName, int? TicketNumber = null): CommandBase;
+public record Command(Guid RaffleId, string BuyerName, int? TicketNumber = null): CommandBase;
 

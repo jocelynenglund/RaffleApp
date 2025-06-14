@@ -3,13 +3,16 @@
 
 ### Create a raffle
 # @name createRaffle
+# @prompt title
+# @prompt numberOfTickets
+# @prompt price
 POST {{RaffleApi_HostAddress}}/raffles
 Content-Type: application/json
 
 {
-  "title": "The Great Raffle",
-  "numberOfTickets": 1000,
-  "price": 500
+  "title": "{{title}}",
+  "numberOfTickets": {{numberOfTickets}},
+  "price": {{price}}
 }
 ### Get the raffle by ID
 @location = {{createRaffle.response.headers.Location}}
@@ -17,3 +20,17 @@ Content-Type: application/json
 ###
 GET {{RaffleApi_HostAddress}}{{location}}
 Accept: application/json
+
+### Buy a ticket
+# @name buyTicket
+# @prompt HolderName
+POST {{RaffleApi_HostAddress}}{{location}}/tickets
+Content-type: application/json
+
+{
+  "holderName": "{{HolderName}}"
+}
+
+
+# id e353bff6-d0f0-4760-baaf-1c728d0e91a9
+#/raffles/ccb2d383-3830-4b4d-a027-72ae4b7655ae

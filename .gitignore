@@ -361,3 +361,10 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+RaffleApi/Storage/raffle_5c4ac3eb-3fea-4bc0-9f0e-78ba1201dced.json
+RaffleApi/Storage/raffle_8a9a605a-409e-488a-a98f-d4ff9001e7bb.json
+RaffleApi/Storage/raffle_23e2a10f-a5c1-4cbf-9a05-56432108b968.json
+RaffleApi/Storage/raffle_95eb95b1-1624-4254-a0c6-5e3234410dbe.json
+RaffleApi/Storage/raffle_2840eae6-9ee6-44be-b37f-41b8a50ac06b.json
+RaffleApi/Storage/raffle_a9c2400f-db69-4e93-9f45-2e04957d04f3.json
+RaffleApi/Storage/raffle_ccb2d383-3830-4b4d-a027-72ae4b7655ae.json

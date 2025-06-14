@@ -1,13 +1,27 @@
-﻿namespace RaffleDraw;
+﻿using RaffleApi.Infrastructure;
+using RaffleDraw.Domain.Ports;
+
+namespace RaffleDraw;
+
 public static class Extensions
 {
     public static IServiceCollection InstallRaffle(this IServiceCollection services)
     {
-        // Register the RaffleDraw services
         services.AddScoped<Features.CreateRaffle.Handler>();
         services.AddScoped<Features.GetRaffle.Handler>();
-        services.AddSingleton<Domain.Ports.IRaffleRepository, RaffleApi.Infrastructure.InMemoryRaffleRepository>();
-        // Add any additional registrations needed for RaffleDraw
+        services.AddScoped<Features.BuyTicket.Handler>();
+
+        services.AddSingleton<IRaffleRepository>(sp =>
+        {
+            var storageDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Storage");
+            // Ensure storage directory exists
+            if (!Directory.Exists(storageDirectory))
+            {
+                Directory.CreateDirectory(storageDirectory);
+            }
+            return new FileBasedRaffleRepository(storageDirectory);
+        });
+
         return services;
     }
 }
