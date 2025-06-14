@@ -120,8 +120,28 @@ public class Raffle : AggregateRoot<DomainEvent>
                 "No tickets have been bought. Cannot select a winner."
             );
         }
-        var winner = _winnerSelector.ChooseWinner([.. _boughtTickets.Select(t => t.Number)]);
-        var winningTicket = _boughtTickets.FirstOrDefault(x => x.Number == winner);
+
+        var unselectedTickets = _boughtTickets
+            .Except(_selectedTickets)
+            .ToList();
+
+        if (unselectedTickets.Count == 0)
+        {
+            throw new InvalidOperationException(
+                "No unselected tickets remain."
+            );
+        }
+
+        var winner =
+            _winnerSelector.ChooseWinner([
+                .. unselectedTickets.Select(t => t.Number)
+            ]);
+
+        var winningTicket =
+            unselectedTickets.FirstOrDefault(x => x.Number == winner)
+            ?? throw new InvalidOperationException(
+                $"Ticket number {winner} does not exist."
+            );
 
         RaiseEvent(new WinnerSelected(winningTicket.Number, Id));
     }

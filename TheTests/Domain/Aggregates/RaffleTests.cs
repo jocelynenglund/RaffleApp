@@ -96,5 +96,41 @@ public class RaffleTests
 
     }
 
+    [Fact]
+    public void SelectWinner_ShouldNotSelectSameTicketTwice()
+    {
+        var raffle = Raffle.LoadFromHistory(
+        [
+            new RaffleCreated("My Raffle", 2, 100.00m),
+            new TicketBought("Jane", Guid.NewGuid()),
+            new TicketBought("John", Guid.NewGuid())
+        ],
+        new LastManWinnerSelector());
+
+        raffle.Handle(new RaffleDraw.Features.SelectWinner.Command(raffle.Id));
+        var first = raffle.SelectedTickets.Last().Number;
+
+        raffle.Handle(new RaffleDraw.Features.SelectWinner.Command(raffle.Id));
+        var second = raffle.SelectedTickets.Last().Number;
+
+        first.ShouldNotBe(second);
+        raffle.SelectedTickets.Count.ShouldBe(2);
+    }
+
+    [Fact]
+    public void SelectWinner_ShouldThrowException_WhenAllTicketsSelected()
+    {
+        var raffle = Raffle.LoadFromHistory(
+        [
+            new RaffleCreated("My Raffle", 1, 100.00m),
+            new TicketBought("Jane", Guid.NewGuid())
+        ],
+        new LastManWinnerSelector());
+
+        raffle.Handle(new RaffleDraw.Features.SelectWinner.Command(raffle.Id));
+
+        Should.Throw<InvalidOperationException>(() => raffle.Handle(new RaffleDraw.Features.SelectWinner.Command(raffle.Id)));
+    }
+
 }
 
