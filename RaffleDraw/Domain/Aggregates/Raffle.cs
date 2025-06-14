@@ -107,7 +107,7 @@ public class Raffle : AggregateRoot<DomainEvent>
             // Alternative approach: ticketNumber = _availableTickets.First().Number;
         }
 
-        RaiseEvent(new TicketBought(buyTicket.BuyerName, Id, buyTicket.TicketNumber));
+        RaiseEvent(new TicketBought(buyTicket.BuyerName, Id, ticketNumber));
 
         return ticketNumber;
     }
