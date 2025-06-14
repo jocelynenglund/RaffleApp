@@ -26,6 +26,15 @@ To launch the web API during development run:
 
 The API listens on the default ASP.NET ports and provides Swagger UI for exploration.
 
+## API Endpoints
+
+The following endpoints are available:
+
+- `POST /raffles` - create a raffle.
+- `GET /raffles/{id}` - retrieve a raffle by id.
+- `POST /raffles/{id}/tickets` - purchase a ticket.
+- `POST /raffles/{id}/select-winner` - select a winning ticket and return the ticket number.
+
 ## Running tests
 
 Unit tests are found in the `TheTests` project and can be executed with:
