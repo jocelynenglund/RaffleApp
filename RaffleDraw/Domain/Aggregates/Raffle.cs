@@ -121,27 +121,18 @@ public class Raffle : AggregateRoot<DomainEvent>
             );
         }
 
-        var unselectedTickets = _boughtTickets
-            .Except(_selectedTickets)
-            .ToList();
+        var unselectedTickets = _boughtTickets.Except(_selectedTickets).ToList();
 
         if (unselectedTickets.Count == 0)
         {
-            throw new InvalidOperationException(
-                "No unselected tickets remain."
-            );
+            throw new InvalidOperationException("No unselected tickets remain.");
         }
 
-        var winner =
-            _winnerSelector.ChooseWinner([
-                .. unselectedTickets.Select(t => t.Number)
-            ]);
+        var winner = _winnerSelector.ChooseWinner([.. unselectedTickets.Select(t => t.Number)]);
 
         var winningTicket =
             unselectedTickets.FirstOrDefault(x => x.Number == winner)
-            ?? throw new InvalidOperationException(
-                $"Ticket number {winner} does not exist."
-            );
+            ?? throw new InvalidOperationException($"Ticket number {winner} does not exist.");
 
         RaiseEvent(new WinnerSelected(winningTicket.Number, Id));
     }
@@ -183,7 +174,16 @@ public class Raffle : AggregateRoot<DomainEvent>
 
     protected override void ApplyEvent(DomainEvent @event)
     {
-        When((dynamic)@event);
+        if (_handlers.TryGetValue(@event.GetType(), out var handler))
+        {
+            handler(@event);
+        }
+        else
+        {
+            throw new InvalidOperationException(
+                $"No handler registered for event type {@event.GetType().Name}."
+            );
+        }
     }
 }
 
