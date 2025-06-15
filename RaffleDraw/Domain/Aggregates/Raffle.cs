@@ -10,8 +10,8 @@ namespace RaffleDraw.Domain.Aggregates;
 
 public class Raffle : AggregateRoot<DomainEvent>
 {
+    #region Properties
     public decimal TicketPrice { get; private set; }
-
     public int InitialTicketNumber => 1000; // Starting point for ticket numbers
 
     private List<Ticket> _availableTickets = [];
@@ -44,7 +44,7 @@ public class Raffle : AggregateRoot<DomainEvent>
 
     private Raffle(IWinnerSelector winnerSelector, params DomainEvent[] events)
         : this(winnerSelector) => base.Rehydrate(events.AsEnumerable());
-
+    #endregion
     public static Raffle Create(
         Features.CreateRaffle.Command createRaffleCommand,
         IWinnerSelector winnerSelector = null
