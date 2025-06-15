@@ -3,9 +3,8 @@
 public abstract class AggregateRoot<TEvent>
 {
     private readonly List<TEvent> _changes = new();
+    protected Dictionary<Type, Action<TEvent>> Handlers { get; init; } = [];
     public IReadOnlyList<TEvent> UncommittedChanges => _changes;
-
-    protected abstract void ApplyEvent(TEvent @event);
 
     /// <summary>
     /// Used in command handlers: applies state + buffers for persistence.
@@ -22,5 +21,19 @@ public abstract class AggregateRoot<TEvent>
     {
         foreach (var e in history)
             ApplyEvent(e);
+    }
+
+    protected virtual void ApplyEvent(TEvent @event)
+    {
+        if (Handlers.TryGetValue(@event.GetType(), out var handler))
+        {
+            handler(@event);
+        }
+        else
+        {
+            throw new InvalidOperationException(
+                $"No handler registered for event type {@event.GetType().Name}."
+            );
+        }
     }
 }

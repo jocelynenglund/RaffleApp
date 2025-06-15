@@ -10,7 +10,8 @@ builder.Services.InstallRaffle();
 var app = builder.Build();
 
 app.UseHttpsRedirection();
-app.UseFastEndpoints()
-    .UseSwaggerGen();
+app.UseFastEndpoints().UseSwaggerGen();
 
 app.Run();
+
+public partial class Program { }

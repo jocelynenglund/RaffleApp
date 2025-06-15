@@ -1,9 +1,9 @@
 using System.Net.Http.Json;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Hosting;
-using RaffleDraw.Domain.Ports;
 using RaffleApi.Infrastructure;
+using RaffleDraw.Domain.Ports;
 using Shouldly;
 
 namespace TheTests.Integration;
@@ -14,7 +14,9 @@ public class RaffleApiFactory : WebApplicationFactory<Program>
     {
         builder.ConfigureServices(services =>
         {
-            var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IRaffleRepository));
+            var descriptor = services.SingleOrDefault(d =>
+                d.ServiceType == typeof(IRaffleRepository)
+            );
             if (descriptor != null)
                 services.Remove(descriptor);
             services.AddSingleton<IRaffleRepository, InMemoryRaffleRepository>();
@@ -34,7 +36,15 @@ public class WinnerEndpointTests : IClassFixture<RaffleApiFactory>
     [Fact]
     public async Task SelectingWinnerShouldAppearInGetResponse()
     {
-        var create = await _client.PostAsJsonAsync("/raffles", new { Title = "Test", NumberOfTickets = 1, Price = 5m });
+        var create = await _client.PostAsJsonAsync(
+            "/raffles",
+            new
+            {
+                Title = "Test",
+                NumberOfTickets = 1,
+                Price = 5m,
+            }
+        );
         create.EnsureSuccessStatusCode();
         var location = create.Headers.Location!.ToString();
 
@@ -45,10 +55,22 @@ public class WinnerEndpointTests : IClassFixture<RaffleApiFactory>
 
         var raffle = await _client.GetFromJsonAsync<GetRaffleResponse>(location);
 
-        raffle!.SelectedTickets.ShouldContain(t => t.Number == winner!.TicketNumber && t.HolderName == "Jane");
+        raffle!.SelectedTickets.ShouldContain(t =>
+            t.Number == winner!.TicketNumber && t.HolderName == "Jane"
+        );
     }
 
     private record SelectWinnerResponse(int TicketNumber);
+
     private record TicketInfo(int Number, string HolderName);
-    private record GetRaffleResponse(Guid Id, string Title, int NumberOfTickets, int AvailableTickets, decimal TicketPrice, List<TicketInfo> BoughtTickets, List<TicketInfo> SelectedTickets);
+
+    private record GetRaffleResponse(
+        Guid Id,
+        string Title,
+        int NumberOfTickets,
+        int AvailableTickets,
+        decimal TicketPrice,
+        List<TicketInfo> BoughtTickets,
+        List<TicketInfo> SelectedTickets
+    );
 }

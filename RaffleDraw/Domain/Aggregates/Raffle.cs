@@ -28,13 +28,12 @@ public class Raffle : AggregateRoot<DomainEvent>
 
     private int _numberOfTickets;
     private IWinnerSelector _winnerSelector;
-    private readonly Dictionary<Type, Action<DomainEvent>> _handlers;
 
     private Raffle(IWinnerSelector winnerSelector = null)
     {
         Title = "Default Title";
         _winnerSelector = winnerSelector ?? new RandomWinnerSelector();
-        _handlers = new()
+        Handlers = new()
         {
             { typeof(RaffleCreated), ev => When((RaffleCreated)ev) },
             { typeof(TicketBought), ev => When((TicketBought)ev) },
@@ -170,20 +169,6 @@ public class Raffle : AggregateRoot<DomainEvent>
             );
 
         _selectedTickets.Add(ticket);
-    }
-
-    protected override void ApplyEvent(DomainEvent @event)
-    {
-        if (_handlers.TryGetValue(@event.GetType(), out var handler))
-        {
-            handler(@event);
-        }
-        else
-        {
-            throw new InvalidOperationException(
-                $"No handler registered for event type {@event.GetType().Name}."
-            );
-        }
     }
 }
 
