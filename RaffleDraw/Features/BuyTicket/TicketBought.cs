@@ -1,4 +1,4 @@
-﻿using RaffleDraw.Core.Common;
+﻿using RaffleDraw.Core;
 
 namespace RaffleDraw.Features.BuyTicket;
 

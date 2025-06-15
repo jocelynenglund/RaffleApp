@@ -1,5 +1,5 @@
 ﻿using System.Collections.ObjectModel;
-using RaffleDraw.Core.Common;
+using RaffleDraw.Core;
 using RaffleDraw.Domain.Ports;
 using RaffleDraw.Domain.Services;
 using RaffleDraw.Features.BuyTicket;

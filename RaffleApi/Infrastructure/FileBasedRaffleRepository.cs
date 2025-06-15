@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using RaffleDraw.Core.Common;
+using RaffleDraw.Core;
 using RaffleDraw.Domain.Aggregates;
 using RaffleDraw.Domain.Ports;
 using RaffleDraw.Features.BuyTicket;

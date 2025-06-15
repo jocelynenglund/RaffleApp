@@ -1,7 +1,7 @@
-using RaffleDraw.Core.Common;
+using System.Collections.Concurrent;
+using RaffleDraw.Core;
 using RaffleDraw.Domain.Aggregates;
 using RaffleDraw.Domain.Ports;
-using System.Collections.Concurrent;
 
 namespace RaffleApi.Infrastructure;
 
@@ -33,7 +33,6 @@ public class InMemoryRaffleRepository : IRaffleRepository
 
     public Task<Raffle?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-
         if (_raffleEvents.TryGetValue(id, out var events))
             return Task.FromResult<Raffle?>(Raffle.LoadFromHistory(events));
         // Option 1: Return state-based
@@ -52,6 +51,6 @@ public class InMemoryRaffleRepository : IRaffleRepository
     }
 
     // Optionally, expose event streams for testing or diagnostics
-    public IEnumerable<DomainEvent> GetEventsForRaffle(Guid id)
-        => _raffleEvents.TryGetValue(id, out var events) ? events : Enumerable.Empty<DomainEvent>();
+    public IEnumerable<DomainEvent> GetEventsForRaffle(Guid id) =>
+        _raffleEvents.TryGetValue(id, out var events) ? events : Enumerable.Empty<DomainEvent>();
 }

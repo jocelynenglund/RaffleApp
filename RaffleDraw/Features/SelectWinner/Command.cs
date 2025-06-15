@@ -1,5 +1,5 @@
-﻿using RaffleDraw.Core.Common;
+﻿using RaffleDraw.Core;
 
 namespace RaffleDraw.Features.SelectWinner;
 
-public record Command(Guid RaffleId): CommandBase;
+public record Command(Guid RaffleId) : CommandBase;

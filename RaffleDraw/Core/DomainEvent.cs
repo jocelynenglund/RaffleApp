@@ -1,6 +1,7 @@
-﻿namespace RaffleDraw.Core.Common;
+﻿namespace RaffleDraw.Core;
 
-public abstract record DomainEvent {
+public abstract record DomainEvent
+{
     public DateTime OccurredOn { get; set; } = DateTime.UtcNow;
 
     protected DomainEvent(TimeProvider? timeProvider = null)

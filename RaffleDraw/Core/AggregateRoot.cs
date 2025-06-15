@@ -1,4 +1,4 @@
-﻿namespace RaffleDraw.Core.Common;
+﻿namespace RaffleDraw.Core;
 
 public abstract class AggregateRoot<TEvent>
 {
@@ -6,6 +6,7 @@ public abstract class AggregateRoot<TEvent>
     public IReadOnlyList<TEvent> UncommittedChanges => _changes;
 
     protected abstract void ApplyEvent(TEvent @event);
+
     /// <summary>
     /// Used in command handlers: applies state + buffers for persistence.
     /// </summary>
@@ -19,6 +20,7 @@ public abstract class AggregateRoot<TEvent>
 
     public void Rehydrate(IEnumerable<TEvent> history)
     {
-        foreach (var e in history) ApplyEvent(e);
+        foreach (var e in history)
+            ApplyEvent(e);
     }
 }
